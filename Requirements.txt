@@ -1,0 +1,2 @@
+Requirements for Interactive Sorcery
+pip install opencv-python
