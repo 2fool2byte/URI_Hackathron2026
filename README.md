@@ -1,1 +1,1 @@
-# URI_Hackathron2026
+# URI_Hackathon2026
