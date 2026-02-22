@@ -38,6 +38,20 @@ def draw_bg():
 def draw_panel(img):
     screen.blit(img, (0, SCREEN_HEIGHT - BOTTOM_PANEL))
 
+class Skill():
+    def __init__(self, name, damage, mana_cost, element, type, max_cooldown):
+        self.name = name
+        self.damage = damage
+        self.mana_cost = mana_cost
+        self.element = element
+        # type: 0 = basic, 1 = signature
+        self.type = type
+        self.max_cooldown = max_cooldown
+        self.cooldown = 0
+    
+    def getDamage(self):
+        return self.damage
+
 class Character():
     def __init__(self, x, y, name, max_health):
         self.name = name
@@ -67,8 +81,7 @@ class Character():
         self.rect = self.image.get_rect()
         self.rect.topleft = (x, y)
     
-    def attack(self, target, skill):
-        
+
 
     def update(self):
         animation_cooldown = 330
