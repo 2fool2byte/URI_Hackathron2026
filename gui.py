@@ -3,40 +3,125 @@ import sys
 
 pygame.init()
 
+clock = pygame.time.Clock()
+fps = 60
+
+# ------------ Constants ------------
+BOTTOM_PANEL = 200
 SCREEN_WIDTH = 1280
-SCREEN_HEIGHT = 720
+SCREEN_HEIGHT = 520 + BOTTOM_PANEL
+
+# -----------------------------------
 
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 pygame.display.set_caption("My Pygame Window")
 
-start_img = pygame.image.load('start_btn.png').convert_alpha
-exit_img = pygame.image.load('exit_button.png').convert_alpha
+# Load Images
 
-# def Button():
-#     def __init__(self, x, y, image):
+# Background Images
+main_menu_bg = pygame.image.load('img/Backgrounds/main_menu_bg.png').convert_alpha()
+main_menu_bg = pygame.transform.scale(main_menu_bg, (SCREEN_WIDTH, SCREEN_HEIGHT))
+
+game_bg = pygame.image.load('img/Backgrounds/game_bg.png').convert_alpha()
+game_bg = pygame.transform.scale(game_bg, (SCREEN_WIDTH, SCREEN_HEIGHT))
+
+# Panel Images
+# panel_img = pygame.image.load('panel.png').convert_alpha
+
+# Button Images
+# start_img = pygame.image.load('start_btn.png').convert_alpha
+# exit_img = pygame.image.load('exit_button.png').convert_alpha
+
+def draw_bg():
+    screen.blit(game_bg, (0, 0))
+
+def draw_panel(img):
+    screen.blit(img, (0, SCREEN_HEIGHT - BOTTOM_PANEL))
+
+class Skill():
+    def __init__(self, name, damage, mana_cost, element, type, max_cooldown):
+        self.name = name
+        self.damage = damage
+        self.mana_cost = mana_cost
+        self.element = element
+        # type: 0 = basic, 1 = signature
+        self.type = type
+        self.max_cooldown = max_cooldown
+        self.cooldown = 0
+    
+    def getDamage(self):
+        return self.damage
+
+class Character():
+    def __init__(self, x, y, name, max_health):
+        self.name = name
+        self.max_health = max_health
+        self.health = max_health
+
+        self.animation_list = []
+        self.frame_index = 0
+        # 0: idle, 1: attack, 2: hurt, 3: death
+        self.action = 0
+        self.update_time = pygame.time.get_ticks()
+        # Load idle images
+        temp_list = []
+        for i in range(4):
+            img = pygame.image.load(f'img/{self.name}/Idle/{i}.png').convert_alpha()
+            img = pygame.transform.scale(img, (img.get_width() * 3, img.get_height() * 3))
+            temp_list.append(img)
+        self.animation_list.append(temp_list)
+        # Load attack images
+        temp_list = []
+        for i in range(4):
+            img = pygame.image.load(f'img/{self.name}/Attack/{i}.png').convert_alpha()
+            img = pygame.transform.scale(img, (img.get_width() * 3, img.get_height() * 3))
+            temp_list.append(img)
+        self.animation_list.append(temp_list)
+        self.image = self.animation_list[self.action][self.frame_index]
+        self.rect = self.image.get_rect()
+        self.rect.topleft = (x, y)
+    
+
+
+    def update(self):
+        animation_cooldown = 330
+        # update image depending on current frame
+        self.image = self.animation_list[self.action][self.frame_index]
+        if pygame.time.get_ticks() - self.update_time > animation_cooldown:
+            self.update_time = pygame.time.get_ticks()
+            self.frame_index += 1
+        # if the animation has run out then reset back to the start        
+        if self.frame_index >= len(self.animation_list):
+            self.frame_index = 0
+
+    def draw(self):
+        screen.blit(self.image, self.rect)
+
+player = Character(150, 250, "Player", 100)
 
 
 running = True
 while running:
-    # 1. Handle events (user input, window close, etc.)
+
+    clock.tick(fps)
+
+    draw_bg()
+    # draw_panel()
+
+    # Draw Player
+    player.draw()
+    player.update()
+
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
-        # Handle other events here (e.g., keyboard presses, mouse clicks)
-        # if event.type == pygame.KEYDOWN: ...
 
-    # 2. Game logic and drawing
-    # Fill the screen with a color (e.g., white using RGB values)
-    screen.fill((255, 255, 255))
-    
-    # Draw elements onto the screen (e.g., shapes, images)
-    # pygame.draw.circle(screen, (0, 0, 0), (100, 100), 50)
+    pygame.display.update()
 
-    # 3. Update the display
-    # This makes everything we've drawn visible
-    pygame.display.flip()
-    # To control the frame rate
-    # clock.tick(60)
+
+
+
+
 
 # Quit Pygame
 pygame.quit()

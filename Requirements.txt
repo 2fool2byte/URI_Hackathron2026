@@ -1,2 +1,3 @@
 Requirements for Interactive Sorcery
-pip install opencv-python
+# pip install opencv-python
+pip install pygame
