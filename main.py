@@ -48,16 +48,14 @@ class Button():
 # ---------------------------
 
 # Load Button Images (make sure these exist in the img folder)
-items_button_img = pygame.image.load('img/Icons\\Spells/ItemsButton.png').convert_alpha()
-leafstorm_button_img = pygame.image.load('img/Icons\\Spells/LeafStormButton.png').convert_alpha()
-punch_button_img = pygame.image.load('img/Icons\\Spells/PunchButton.png').convert_alpha()
-aquabolt_button_img = pygame.image.load('img/Icons\\Spells/AquaBoltButton.png').convert_alpha()
+items_button_img = pygame.image.load('img/UI/ItemsButton.png').convert_alpha()
+punch_button_img = pygame.image.load('img/UI/PunchButton.png').convert_alpha()
+spells_button_img = pygame.image.load('img/UI/SpellsButton.png').convert_alpha()
 
 # Create Button Instances (position, scale)
-items_button = Button(SCREEN_WIDTH/2 + SCREEN_WIDTH/3, 400, items_button_img, scale=0.5)
-leafstorm_button = Button(SCREEN_WIDTH/3, 400, leafstorm_button_img, scale=0.5)
+items_button = Button(SCREEN_WIDTH/2 + SCREEN_WIDTH/15, SCREEN_HEIGHT - 100, items_button_img, scale=1)
 punch_button = Button(500, 400, punch_button_img, scale=0.5)
-aquabolt_button = Button(700, 400, aquabolt_button_img, scale=0.5)
+spells_button = Button(700, 400, spells_button_img, scale=0.5)
 
 # ---------------------------
 # Skill and Character Classes (as in your code)
@@ -127,9 +125,9 @@ while running:
 
     # Draw Buttons
     items_button.draw(screen)
-    leafstorm_button.draw(screen)
+    spells_button.draw(screen)
     punch_button.draw(screen)
-    aquabolt_button.draw(screen)
+    
 
     # Draw Player
     player.draw()
