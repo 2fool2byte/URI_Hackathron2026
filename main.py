@@ -1,7 +1,6 @@
 import pygame
 import sys
 
-from spells import spell, spells
 
 pygame.init()
 
@@ -34,7 +33,6 @@ game_bg = pygame.image.load('img/Backgrounds/game_bg.png').convert_alpha()
 game_bg = pygame.transform.scale(game_bg, (SCREEN_WIDTH, SCREEN_HEIGHT))
 
 # Load Settings Menu 
-current_menu = "main" 
 
 # Load Panel Image
 panel_img = pygame.image.load('img/Icons/UI/Scroll.png').convert_alpha()
@@ -50,28 +48,6 @@ mana_holder_img = pygame.transform.scale(mana_holder_img, (mana_holder_img.get_w
 health_img = pygame.transform.scale(health_img, (health_img.get_width() * 0.75, health_img.get_height() * 0.75))
 mana_img = pygame.transform.scale(mana_img, (mana_img.get_width() * 0.75, mana_img.get_height() * 0.75))
 
-def open_spells():
-    global active_buttons, current_menu
-    current_menu = "spells"
-    active_buttons = [back_button, fire_button, aqua_button, punch_button]
-
-def back_to_main():
-    global active_buttons, current_menu
-    current_menu = "main"
-    active_buttons = [items_button, spells_button, punch_button]
-
-def fire_spell():
-    print("Fire spell cast!")
-    back_to_main()
-
-def aqua_spell():
-    print("Aqua spell cast!")
-    back_to_main()
-
-# Load Button Images (make sure these exist in the img folder)
-# Create Button Instances (position, scale)
-# ---------------------------
-# Skill and Character Classes (as in your code)
 # Draw Text
 def draw_text(text, font, color, x, y):
     img = font.render(text, True, color)
@@ -131,18 +107,9 @@ punch_button_img = pygame.image.load('img/Icons/UI/PunchButton.png').convert_alp
 spells_button_img = pygame.image.load('img/Icons/UI/SpellsButton.png').convert_alpha()
 
 # Create Button Instances (position, scale)
-items_button = Button((SCREEN_WIDTH / 2 + SCREEN_WIDTH / 4) - items_button_img.get_width() - 20, BOTTOM_PANEL + 445, items_button_img, 1)
-punch_button = Button((SCREEN_WIDTH / 2 + SCREEN_WIDTH / 4) - items_button_img.get_width() / 2 - 20, (BOTTOM_PANEL + 440) - items_button_img.get_height(), punch_button_img, 1)
-spells_button = Button((SCREEN_WIDTH / 2 + SCREEN_WIDTH / 4) - 10, BOTTOM_PANEL + 445, spells_button_img, 1, open_spells)
-
-#Spell UI Button Instances
-aqua_button_img = pygame.image.load('img/Icons/Spells/AquaBoltButton.png').convert_alpha()
-fire_button_img = pygame.image.load('img/Icons/Spells/FireBallButton.png').convert_alpha()
-back_button_img = pygame.image.load('img/Icons/UI/Escape.png').convert_alpha()
-
-aqua_button = Button((SCREEN_WIDTH / 2 + SCREEN_WIDTH / 4) - items_button_img.get_width() - 20, BOTTOM_PANEL + 445, aqua_button_img, 1, aqua_spell)
-fire_button = Button((SCREEN_WIDTH / 2 + SCREEN_WIDTH / 4) - 10, BOTTOM_PANEL + 445, fire_button_img, 1, fire_spell)
-back_button = Button((SCREEN_WIDTH / 2 + SCREEN_WIDTH/2) - 100, (BOTTOM_PANEL + 440) - items_button_img.get_height(), back_button_img, 0.08, back_to_main)
+items_button = Button((SCREEN_WIDTH / 2 + SCREEN_WIDTH / 4) - items_button_img.get_width() - 20, BOTTOM_PANEL + 445, items_button_img, scale=1)
+punch_button = Button((SCREEN_WIDTH / 2 + SCREEN_WIDTH / 4) - items_button_img.get_width() / 2 - 20, (BOTTOM_PANEL + 440) - items_button_img.get_height(), punch_button_img, scale=1)
+spells_button = Button((SCREEN_WIDTH / 2 + SCREEN_WIDTH / 4) - 10, BOTTOM_PANEL + 445, spells_button_img, scale=1)
 
 # ---------------------------
 # Skill and Character Classes (as in your code)
@@ -161,13 +128,12 @@ class Skill():
         return self.damage
 
 class Character():
-    def __init__(self, x, y, name, max_health, max_mana, skills):
+    def __init__(self, x, y, name, max_health, max_mana):
         self.name = name
         self.max_health = max_health
         self.health = max_health
         self.max_mana = max_mana
         self.mana = max_mana
-        self.skills = skills
 
         self.animation_list = []
         self.frame_index = 0
@@ -197,17 +163,15 @@ class Character():
     # Replaces the selected skill with a new skill, the player can only hold up to 2 skills at a time, 
     # the player can only replace index 1 with basic skills and index 2 with signature skills,
     # the player can only replace a skill after a level is cleared
-    def update_skill(self, skill):
-        if len(self.skills) < 3:
-            if skill.spell_type == spells.SpellType.Basic:
-                self.skills.insert(1, skill)
-            else:
-                self.skills.insert(2, skill)
-        else:
-            self.skills[1] = skill if skill.spell_type == spells.SpellType.Basic else self.skills[2] = skill
+    
 
     def updateX(self, x):
         self.rect.x = x
+
+    def updateAction(self, new_action):
+        self.action = new_action
+        self.frame_index = 0
+        self.update_time = pygame.time.get_ticks()
 
     def update(self):
         animation_cooldown = 330
@@ -217,6 +181,10 @@ class Character():
             self.frame_index += 1
         if self.frame_index >= len(self.animation_list[self.action]):
             self.frame_index = 0
+            if self.action == 0:
+                self.updateAction(1)
+            elif self.action == 1:
+                self.updateAction(0)
 
     def draw(self):
         screen.blit(self.image, self.rect)
@@ -245,19 +213,12 @@ class HealthBar():
         return self.health > 0
 
 # Create Player Character
-player = Character(25, 250, "Player", 100, 100, [spells.punch, spells.aqua_bolt, spells.fireball])
+player = Character(0, 250, "Player", 100, 100)
 # Create Enemy Characters
-slime = Character(900, 250, "Slime", 50, 0, [spells.splash])
-fire_spirit = Character(900, 250, "FireSpirit", 60, 0, [spells.ignite])
-golem = Character(900, 250, "Golem", 80, 0, [spells.rock_throw, spells.entangle])
-witch = Character(900, 250, "Witch", 70, 0, [spells.curse, spells.aqua_bolt, spells.vine_whip, spells.fireball])
-
-stages = [
-    {"enemies": [slime], "background": game_bg},
-    {"enemies": [fire_spirit, slime], "background": game_bg},
-    {"enemies": [golem, slime], "background": game_bg},
-    {"enemies": [witch, golem, fire_spirit], "background": game_bg}
-]
+slime = Character(250, 250, "Slime", 50, 0)
+fire_spirit = Character(500, 250, "FireSpirit", 60, 0)
+golem = Character(740, 250, "Golem", 80, 0)
+witch = Character(1000, 250, "Witch", 70, 0)
 
 # Game Loop
 running = True
@@ -276,6 +237,14 @@ while running:
     # Draw Player
     player.draw()
     player.update()
+    slime.draw()
+    slime.update()
+    fire_spirit.draw()
+    fire_spirit.update()
+    golem.draw()
+    golem.update()
+    witch.draw()
+    witch.update()
 
     # Draw Resources (Health and Mana)
     draw_resources(player.health, player.mana)
@@ -285,26 +254,21 @@ while running:
         if event.type == pygame.QUIT:
             running = False
 
-        # Pass the event to the buttons for click handling
-        if current_menu == "main":
-            items_button.is_clicked(event)
-            spells_button.is_clicked(event)
-            punch_button.is_clicked(event)
-        elif current_menu == "spells":
-            back_button.is_clicked(event)
-            fire_button.is_clicked(event)
-            aqua_button.is_clicked(event)
+        if event.type == pygame.MOUSEBUTTONDOWN:
+            mouse_pos = pygame.mouse.get_pos()  # Get mouse position
 
-            
-    if current_menu == "main":
-        items_button.draw(screen)
-        spells_button.draw(screen)
-        punch_button.draw(screen)
-    elif current_menu == "spells":
-        back_button.draw(screen)
-        fire_button.draw(screen)
-        aqua_button.draw(screen)
-        punch_button.draw(screen)
+            # Check if any button was clicked and perform actions
+            if items_button.is_clicked(mouse_pos):
+                print("Items Button Clicked!")
+                # Add game logic for Items Button here
+
+            if spells_button.is_clicked(mouse_pos):
+                print("Spells Button Clicked!")
+                # Add game logic for Spells Button here
+
+            if punch_button.is_clicked(mouse_pos):
+                print("Punch Button Clicked!")
+                # Add game logic for Punch Button here
 
     pygame.display.update()  # Update the screen
 

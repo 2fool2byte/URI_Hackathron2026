@@ -1,2 +1,5 @@
 # URI_Hackathon2026
-# Test
+# This project was made partly with generative AI:
+#   - Copilot
+#   - ChatGPT
+#   - Gemini
