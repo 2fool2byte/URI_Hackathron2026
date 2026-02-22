@@ -1,7 +1,7 @@
 import pygame
 import sys
 
-from spells import spells
+from spells import spell, spells
 
 pygame.init()
 
@@ -162,8 +162,20 @@ class Character():
         self.rect = self.image.get_rect()
         self.rect.topleft = (x, y)
 
-    def attack(self, target):
-        
+    # Replaces the selected skill with a new skill, the player can only hold up to 2 skills at a time, 
+    # the player can only replace index 1 with basic skills and index 2 with signature skills,
+    # the player can only replace a skill after a level is cleared
+    def update_skill(self, skill):
+        if len(self.skills) < 3:
+            if skill.spell_type == spells.SpellType.Basic:
+                self.skills.insert(1, skill)
+            else:
+                self.skills.insert(2, skill)
+        else:
+            self.skills[1] = skill if skill.spell_type == spells.SpellType.Basic else self.skills[2] = skill
+
+    def updateX(self, x):
+        self.rect.x = x
 
     def update(self):
         animation_cooldown = 330
@@ -176,6 +188,17 @@ class Character():
 
     def draw(self):
         screen.blit(self.image, self.rect)
+
+class HealthBar():
+    def __init__(self, x, y, hp, max_hp):
+        self.x = x
+        self.y = y
+        self.hp = hp
+        self.max_hp = max_hp  
+    
+    def draw(self):
+        pygame.draw.rect(screen, (255, 0, 0), (self.x, self.y, 200, 20))
+
 
     # Method to take damage and reduce health, when called; character will flash white for a brief moment to indicate damage taken
     def take_damage(self, damage):
@@ -190,7 +213,12 @@ class Character():
         return self.health > 0
 
 # Create Player Character
-player = Character(25, 250, "Player", 100, 100)
+player = Character(25, 250, "Player", 100, 100, [spells.punch, spells.aqua_bolt, spells.fireball])
+# Create Enemy Characters
+slime = Character(900, 250, "Slime", 50, 0, [spells.splash])
+fire_spirit = Character(900, 250, "FireSpirit", 60, 0, [spells.ignite])
+golem = Character(900, 250, "Golem", 80, 0, [spells.rock_throw, spells.entangle])
+witch = Character(900, 250, "Witch", 70, 0, [spells.curse, spells.aqua_bolt, spells.vine_whip, spells.fireball])
 
 # Game Loop
 running = True
