@@ -24,7 +24,7 @@ game_bg = pygame.image.load('img/Backgrounds/game_bg.png').convert_alpha()
 game_bg = pygame.transform.scale(game_bg, (SCREEN_WIDTH, SCREEN_HEIGHT))
 
 # Panel Image (optional, but you can use it later)
-#panel_img = pygame.image.load('img/panel.png').convert_alpha()
+# panel_img = pygame.image.load('img/panel.png').convert_alpha()
 
 # ---------------------------
 # Button Class for Creating Buttons
@@ -48,14 +48,14 @@ class Button():
 # ---------------------------
 
 # Load Button Images (make sure these exist in the img folder)
-items_button_img = pygame.image.load('img/UI/ItemsButton.png').convert_alpha()
-punch_button_img = pygame.image.load('img/UI/PunchButton.png').convert_alpha()
-spells_button_img = pygame.image.load('img/UI/SpellsButton.png').convert_alpha()
+items_button_img = pygame.image.load('img/Icons/UI/ItemsButton.png').convert_alpha()
+punch_button_img = pygame.image.load('img/Icons/UI/PunchButton.png').convert_alpha()
+spells_button_img = pygame.image.load('img/Icons/UI/SpellsButton.png').convert_alpha()
 
 # Create Button Instances (position, scale)
-items_button = Button(SCREEN_WIDTH/2 + SCREEN_WIDTH/15, SCREEN_HEIGHT - 100, items_button_img, scale=1)
-punch_button = Button(500, 400, punch_button_img, scale=0.5)
-spells_button = Button(700, 400, spells_button_img, scale=0.5)
+items_button = Button((SCREEN_WIDTH / 2 + SCREEN_WIDTH / 4) - items_button_img.get_width() - 20, BOTTOM_PANEL + 445, items_button_img, scale=1)
+punch_button = Button((SCREEN_WIDTH / 2 + SCREEN_WIDTH / 4) - items_button_img.get_width() / 2 - 20, (BOTTOM_PANEL + 440) - items_button_img.get_height(), punch_button_img, scale=1)
+spells_button = Button((SCREEN_WIDTH / 2 + SCREEN_WIDTH / 4) - 10, BOTTOM_PANEL + 445, spells_button_img, scale=1)
 
 # ---------------------------
 # Skill and Character Classes (as in your code)
@@ -121,13 +121,14 @@ while running:
 
     # Draw Background and Panel
     screen.blit(game_bg, (0, 0))
-    #screen.blit(panel_img, (0, SCREEN_HEIGHT - BOTTOM_PANEL))
+
+    # Optional Panel: Uncomment if you want to draw the panel image
+    # screen.blit(panel_img, (0, SCREEN_HEIGHT - BOTTOM_PANEL))
 
     # Draw Buttons
     items_button.draw(screen)
     spells_button.draw(screen)
     punch_button.draw(screen)
-    
 
     # Draw Player
     player.draw()
@@ -146,17 +147,13 @@ while running:
                 print("Items Button Clicked!")
                 # Add game logic for Items Button here
 
-            if leafstorm_button.is_clicked(mouse_pos):
-                print("LeafStorm Button Clicked!")
-                # Add game logic for LeafStorm Button here
+            if spells_button.is_clicked(mouse_pos):
+                print("Spells Button Clicked!")
+                # Add game logic for Spells Button here
 
             if punch_button.is_clicked(mouse_pos):
                 print("Punch Button Clicked!")
                 # Add game logic for Punch Button here
-
-            if aquabolt_button.is_clicked(mouse_pos):
-                print("AquaBolt Button Clicked!")
-                # Add game logic for AquaBolt Button here
 
     pygame.display.update()  # Update the screen
 
