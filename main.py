@@ -34,6 +34,26 @@ COLOR_DARK_GRAY = (50, 50, 50)
 
 # -----------------------------------
 
+def open_spells():
+    global active_buttons, current_menu
+    current_menu = "spells"
+    active_buttons = [back_button, fire_button, aqua_button, punch_button]
+
+def back_to_main():
+    global active_buttons, current_menu
+    current_menu = "main"
+    active_buttons = [items_button, spells_button, punch_button]
+
+def fire_spell():
+    print("Fire spell cast!")
+    back_to_main()
+
+def aqua_spell():
+    print("Aqua spell cast!")
+    back_to_main()
+
+
+
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 pygame.display.set_caption("My Pygame Window")
 
@@ -109,6 +129,7 @@ def draw_resources(health: int, mana: int) -> None:
     draw_text(f'{mana}/100', resource_font, COLOR_BLUE, 210, SCREEN_HEIGHT - 95)
 
 
+<<<<<<< HEAD
 # Button positioning constants
 BUTTON_BASE_X = SCREEN_WIDTH / 2 + SCREEN_WIDTH / 4
 BUTTON_BASE_Y = BOTTOM_PANEL + 445
@@ -117,10 +138,17 @@ class Button:
     """Clickable button UI element."""
     
     def __init__(self, x: float, y: float, image: pygame.Surface, scale: float = 1.0) -> None:
+=======
+# ---------------------------
+# Button Class for Creating Buttons
+class Button:
+    def __init__(self, x, y, image, scale, action=None):
+>>>>>>> 0d028055ca298a9a3248a7a48a3013f1acbda52d
         self.x = x
         self.y = y
         self.original_image = image
         self.scale = scale
+<<<<<<< HEAD
         self.rect = self.original_image.get_rect()
         self.rect.topleft = (x, y)
         self._update_image()
@@ -164,6 +192,70 @@ class Skill:
     
     def __init__(self, name: str, damage: int, mana_cost: int, element: str, 
                  skill_type: int, max_cooldown: int) -> None:
+=======
+        self.action = action
+
+        # Scale the image first
+        width = int(image.get_width() * scale)
+        height = int(image.get_height() * scale)
+        self.image = pygame.transform.scale(image, (width, height))
+
+        # Then create rect from scaled image
+        self.rect = self.image.get_rect()
+        self.rect.topleft = (x, y)
+
+    def draw(self, surface):
+        surface.blit(self.image, self.rect)
+
+    def is_clicked(self, event):
+        if event.type == pygame.MOUSEBUTTONDOWN:
+            if self.rect.collidepoint(event.pos):
+                if self.action:
+                    self.action()
+                return True
+        return False
+# ---------------------------
+
+current_menu = "main" 
+
+
+# Load Button Images (make sure these exist in the img folder)
+items_button_img = pygame.image.load('img/Icons/UI/ItemsButton.png').convert_alpha()
+punch_button_img = pygame.image.load('img/Icons/UI/PunchButton.png').convert_alpha()
+spells_button_img = pygame.image.load('img/Icons/UI/SpellsButton.png').convert_alpha()
+
+# Create Button Instances (position, scale)
+items_button = Button((SCREEN_WIDTH / 2 + SCREEN_WIDTH / 4) - items_button_img.get_width() - 20, BOTTOM_PANEL + 445, items_button_img, 1)
+punch_button = Button((SCREEN_WIDTH / 2 + SCREEN_WIDTH / 4) - items_button_img.get_width() / 2 - 20, (BOTTOM_PANEL + 440) - items_button_img.get_height(), punch_button_img, 1)
+spells_button = Button((SCREEN_WIDTH / 2 + SCREEN_WIDTH / 4) - 10, BOTTOM_PANEL + 445, spells_button_img, 1, open_spells)
+
+#Spell UI Button Instances
+aqua_button_img = pygame.image.load('img/Icons/Spells/AquaBoltButton.png').convert_alpha()
+fire_button_img = pygame.image.load('img/Icons/Spells/FireBallButton.png').convert_alpha()
+back_button_img = pygame.image.load('img/Icons/UI/Escape.png').convert_alpha()
+
+aqua_button = Button((SCREEN_WIDTH / 2 + SCREEN_WIDTH / 4) - items_button_img.get_width() - 20, BOTTOM_PANEL + 445, aqua_button_img, 1, aqua_spell)
+fire_button = Button((SCREEN_WIDTH / 2 + SCREEN_WIDTH / 4) - 10, BOTTOM_PANEL + 445, fire_button_img, 1, fire_spell)
+back_button = Button((SCREEN_WIDTH / 2 + SCREEN_WIDTH/2) - 100, (BOTTOM_PANEL + 440) - items_button_img.get_height(), back_button_img, 0.08, back_to_main)
+# ---------------------------
+# Skill and Character Classes (as in your code)
+
+active_buttons = [items_button, spells_button, punch_button]  # starts with main menu
+
+# Drawing
+for button in active_buttons:
+    button.draw(screen)
+
+# Event handling
+for event in pygame.event.get():
+    if event.type == pygame.QUIT:
+        running = False
+    for button in active_buttons:
+        button.is_clicked(event)
+
+class Skill():
+    def __init__(self, name, damage, mana_cost, element, type, max_cooldown):
+>>>>>>> 0d028055ca298a9a3248a7a48a3013f1acbda52d
         self.name = name
         self.damage = damage
         self.mana_cost = mana_cost
@@ -279,6 +371,7 @@ class Character:
         """Draw character on screen."""
         screen.blit(self.image, self.rect)
 
+<<<<<<< HEAD
 
 # Create Player Character
 player = Character(25, 250, "Player", max_health=100, max_mana=100, skills=[])
@@ -293,6 +386,9 @@ enemies = {
 
 current_enemy = None  # Will be set when a battle starts
 turn = 1
+=======
+player = Character(150, 250, "Player", 100)
+>>>>>>> 0d028055ca298a9a3248a7a48a3013f1acbda52d
 
 # Game Loop
 running = True
@@ -300,26 +396,49 @@ while running:
     clock.tick(fps)  # Cap frame rate for consistent performance
 
     # Draw Background and Panel
+<<<<<<< HEAD
     draw_bg()
     draw_panel(turn)
+=======
+    screen.blit(game_bg, (0, 0))
+>>>>>>> 0d028055ca298a9a3248a7a48a3013f1acbda52d
 
-    # Draw Buttons
-    items_button.draw(screen)
-    spells_button.draw(screen)
-    punch_button.draw(screen)
+    # Optional Panel: Uncomment if you want to draw the panel image
+    # screen.blit(panel_img, (0, SCREEN_HEIGHT - BOTTOM_PANEL))
 
+<<<<<<< HEAD
     # Update and draw Player
+=======
+    # Draw buttons depending on current menu
+    if current_menu == "main":
+        items_button.draw(screen)
+        spells_button.draw(screen)
+        punch_button.draw(screen)
+    elif current_menu == "spells":
+        back_button.draw(screen)
+        fire_button.draw(screen)
+        aqua_button.draw(screen)
+        punch_button.draw(screen)
+
+    # Update and draw player
+>>>>>>> 0d028055ca298a9a3248a7a48a3013f1acbda52d
     player.update()
     player.draw()
 
+<<<<<<< HEAD
     # Draw Resources (Health and Mana)
     draw_resources(player.health, player.mana)
 
     # Handle Events
+=======
+    # -----------------------------
+    # Handle input events
+>>>>>>> 0d028055ca298a9a3248a7a48a3013f1acbda52d
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
 
+<<<<<<< HEAD
         elif event.type == pygame.MOUSEBUTTONDOWN:
             mouse_pos = pygame.mouse.get_pos()  # Get mouse position
 
@@ -339,5 +458,23 @@ while running:
     pygame.display.update()  # Update the display once per frame
 
 # Cleanup resources
+=======
+        # Pass the event to the buttons for click handling
+        if current_menu == "main":
+            items_button.is_clicked(event)
+            spells_button.is_clicked(event)
+            punch_button.is_clicked(event)
+        elif current_menu == "spells":
+            back_button.is_clicked(event)
+            fire_button.is_clicked(event)
+            aqua_button.is_clicked(event)
+
+    # Update the display
+    pygame.display.update()  # Update the screen
+
+
+
+# Quit Pygame
+>>>>>>> 0d028055ca298a9a3248a7a48a3013f1acbda52d
 pygame.quit()
 sys.exit()
