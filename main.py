@@ -9,9 +9,17 @@ clock = pygame.time.Clock()
 fps = 60
 
 # ------------ Constants ------------
+# Game Window
 BOTTOM_PANEL = 200
 SCREEN_WIDTH = 1280
 SCREEN_HEIGHT = 520 + BOTTOM_PANEL
+
+# Font
+text_font = pygame.font.SysFont('copperplate', 30)
+resource_font = pygame.font.SysFont('copperplate', 22)
+
+# Character Size
+CHARACTER_SIZE_MULTIPLIER = 2.5
 
 # -----------------------------------
 
@@ -45,8 +53,53 @@ main_menu_bg = pygame.transform.scale(main_menu_bg, (SCREEN_WIDTH, SCREEN_HEIGHT
 game_bg = pygame.image.load('img/Backgrounds/game_bg.png').convert_alpha()
 game_bg = pygame.transform.scale(game_bg, (SCREEN_WIDTH, SCREEN_HEIGHT))
 
-# Panel Image (optional, but you can use it later)
-# panel_img = pygame.image.load('img/panel.png').convert_alpha()
+# Load Settings Menu 
+
+# Load Panel Image
+panel_img = pygame.image.load('img/Icons/UI/Scroll.png').convert_alpha()
+panel_img = pygame.transform.scale(panel_img, (SCREEN_WIDTH/2, SCREEN_HEIGHT/3))
+
+# Load Resource Images (Health and Mana)
+health_img = pygame.image.load('img/Icons/UI/Health.png').convert_alpha()
+mana_img = pygame.image.load('img/Icons/UI/Mana.png').convert_alpha()
+health_holder_img = pygame.image.load('img/Icons/UI/HealthHolder.png').convert_alpha()
+mana_holder_img = pygame.image.load('img/Icons/UI/ManaHolder.png').convert_alpha()
+health_holder_img = pygame.transform.scale(health_holder_img, (health_holder_img.get_width() * 0.75, health_holder_img.get_height() * 0.75))
+mana_holder_img = pygame.transform.scale(mana_holder_img, (mana_holder_img.get_width() * 0.75, mana_holder_img.get_height() * 0.75))
+health_img = pygame.transform.scale(health_img, (health_img.get_width() * 0.75, health_img.get_height() * 0.75))
+mana_img = pygame.transform.scale(mana_img, (mana_img.get_width() * 0.75, mana_img.get_height() * 0.75))
+
+# Draw Text
+def draw_text(text, font, color, x, y):
+    img = font.render(text, True, color)
+    screen.blit(img, (x, y))
+
+# Draw Background Function
+def draw_bg():
+    screen.blit(game_bg, (0, 0))
+
+def draw_main_menu():
+    screen.blit(main_menu_bg, (0, 0))
+    draw_text('Press Any Key to Start', text_font, (255, 255, 255), SCREEN_WIDTH / 2 - 150, SCREEN_HEIGHT / 2 - 20)
+
+def draw_settings_menu():
+    screen.fill((50, 50, 50))
+    draw_text('Settings Menu - Press Any Key to Return', text_font, (255, 255, 255), SCREEN_WIDTH / 2 - 250, SCREEN_HEIGHT / 2 - 20)
+
+# Draw Panel Function, indicates Turn Number and Player's Turn, Shows how much damage the player does and the enemy does.
+def draw_panel(turn):
+    screen.blit(panel_img, (SCREEN_WIDTH / 2 - panel_img.get_width() / 2, 0))
+    draw_text(f'Turn: {turn}', text_font, (255, 255, 255), SCREEN_WIDTH / 2 - 225, 20)
+
+# Draw Health and Mana on the bottom left corner of the screen side by side with the icons and the text on top of the icons
+def draw_resources(health, mana):
+    screen.blit(health_img, (53, SCREEN_HEIGHT - 130))
+    screen.blit(health_holder_img, (50, SCREEN_HEIGHT - 60))
+    draw_text(f'{health}/{player.max_health}', resource_font, (200, 0, 0), 60, SCREEN_HEIGHT - 95)
+    screen.blit(mana_img, (203, SCREEN_HEIGHT - 130))
+    screen.blit(mana_holder_img, (200, SCREEN_HEIGHT - 60))
+    draw_text(f'{mana}/{player.max_mana}', resource_font, (0, 0, 255), 210, SCREEN_HEIGHT - 95)
+
 
 # ---------------------------
 # Button Class for Creating Buttons
@@ -130,21 +183,24 @@ class Skill():
         return self.damage
 
 class Character():
-    def __init__(self, x, y, name, max_health):
+    def __init__(self, x, y, name, max_health, max_mana, skills):
         self.name = name
         self.max_health = max_health
         self.health = max_health
+        self.max_mana = max_mana
+        self.mana = max_mana
+        self.skills = skills
 
         self.animation_list = []
         self.frame_index = 0
-        self.action = 1  # 0: idle, 1: attack, 2: hurt, 3: death
+        self.action = 0  # 0: idle, 1: attack
         self.update_time = pygame.time.get_ticks()
 
         # Load idle images
         temp_list = []
         for i in range(4):
             img = pygame.image.load(f'img/Characters/{self.name}/Idle/{i}.png').convert_alpha()
-            img = pygame.transform.scale(img, (img.get_width() * 3, img.get_height() * 3))
+            img = pygame.transform.scale(img, (img.get_width() * CHARACTER_SIZE_MULTIPLIER, img.get_height() * CHARACTER_SIZE_MULTIPLIER))
             temp_list.append(img)
         self.animation_list.append(temp_list)
 
@@ -152,13 +208,16 @@ class Character():
         temp_list = []
         for i in range(4):
             img = pygame.image.load(f'img/Characters/{self.name}/Attack/{i}.png').convert_alpha()
-            img = pygame.transform.scale(img, (img.get_width() * 3, img.get_height() * 3))
+            img = pygame.transform.scale(img, (img.get_width() * CHARACTER_SIZE_MULTIPLIER, img.get_height() * CHARACTER_SIZE_MULTIPLIER))
             temp_list.append(img)
         self.animation_list.append(temp_list)
 
         self.image = self.animation_list[self.action][self.frame_index]
         self.rect = self.image.get_rect()
         self.rect.topleft = (x, y)
+
+    def attack(self, target):
+        
 
     def update(self):
         animation_cooldown = 330
@@ -174,18 +233,15 @@ class Character():
 
 player = Character(150, 250, "Player", 100)
 
-
-
 # Game Loop
 running = True
 while running:
     clock.tick(fps)
 
-    # -----------------------------
-    # Draw background
+    # Draw Background and Panel
     screen.blit(game_bg, (0, 0))
 
-    # Optional panel
+    # Optional Panel: Uncomment if you want to draw the panel image
     # screen.blit(panel_img, (0, SCREEN_HEIGHT - BOTTOM_PANEL))
 
     # Draw buttons depending on current menu
@@ -201,7 +257,6 @@ while running:
 
     # Update and draw player
     player.update()
-    player.draw()
 
     # -----------------------------
     # Handle input events
