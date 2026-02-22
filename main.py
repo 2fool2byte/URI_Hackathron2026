@@ -1,6 +1,8 @@
 import pygame
 import sys
 
+from spells import spells
+
 pygame.init()
 
 clock = pygame.time.Clock()
@@ -81,19 +83,23 @@ class Character():
 
         self.animation_list = []
         self.frame_index = 0
-        self.action = 0  # 0: idle, 1: attack, 2: hurt, 3: death
+        self.action = 1  # 0: idle, 1: attack, 2: hurt, 3: death
         self.update_time = pygame.time.get_ticks()
 
         # Load idle images
         temp_list = []
         for i in range(4):
-            img = pygame.image.load(f'img/{self.name}/Idle/{i}.png').convert_alpha()
+            img = pygame.image.load(f'img/Characters/{self.name}/Idle/{i}.png').convert_alpha()
             img = pygame.transform.scale(img, (img.get_width() * 3, img.get_height() * 3))
             temp_list.append(img)
         self.animation_list.append(temp_list)
 
-        # Load attack images (currently not in use, as no attack animations)
+        # Load attack images
         temp_list = []
+        for i in range(4):
+            img = pygame.image.load(f'img/Characters/{self.name}/Attack/{i}.png').convert_alpha()
+            img = pygame.transform.scale(img, (img.get_width() * 3, img.get_height() * 3))
+            temp_list.append(img)
         self.animation_list.append(temp_list)
 
         self.image = self.animation_list[self.action][self.frame_index]
