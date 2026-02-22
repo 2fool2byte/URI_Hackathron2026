@@ -12,7 +12,9 @@ pygame.display.set_caption("My Pygame Window")
 start_img = pygame.image.load('start_btn.png').convert_alpha
 exit_img = pygame.image.load('exit_button.png').convert_alpha
 
-def Button()
+# def Button():
+#     def __init__(self, x, y, image):
+
 
 running = True
 while running:
